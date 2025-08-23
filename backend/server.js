@@ -14,6 +14,3 @@ app.listen(3000, () => {
   connnectDB();
   console.log('Server is running on port 3000, http://localhost:3000/');
 });
-
-//1NWUP8Iz28OleWST
-//jacquelinemc
