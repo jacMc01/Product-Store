@@ -1,15 +1,17 @@
-import { Box, VStack, Heading, Text, HStack, IconButton, useToast } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, VStack, Heading, Text, HStack, IconButton, useToast, useColorModeValue, Modal, useDisclosure, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, Input, Button, ModalFooter } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
-import { use } from 'react';
-import { useColorModeValue } from '@chakra-ui/react';
 import { useProductStore } from '../store/product.js';
 
 export const ProductCard = ({ product, onOpen, onDelete }) => {
     const bgColor = useColorModeValue('cyan.50', 'gray.700');
     const { deleteProduct} = useProductStore();
     const toast = useToast();
+    const {isOpen, onOpen: onOpenModal, onClose} = useDisclosure();
+    const [updatedProduct, setUpdatedProduct] = useState({});
 
     const handleDeleteProduct = async (pid) => {
+        onClose();
         const { success, message } = await deleteProduct(pid);
         if(!success) {
             toast({
@@ -41,8 +43,31 @@ export const ProductCard = ({ product, onOpen, onDelete }) => {
         </div>
         <HStack spacing="2" mt="4">
             <IconButton icon={<EditIcon />} onClick={() => onOpen(product)} colorScheme='teal' />
-            <IconButton icon={<DeleteIcon />} onClick={(() => handleDeleteProduct(product._id))} colorScheme='red' />
+            <IconButton icon={<DeleteIcon />} onClick={onOpenModal} colorScheme='red' />
         </HStack>
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Delete Product</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <VStack spacing={4}>
+                        <Input placeholder="Product Name" value={updatedProduct.name} isDisabled />
+                        <Input placeholder="Price" value={updatedProduct.price} type="number" isDisabled />
+                        <Input placeholder="Image URL" value={updatedProduct.image} isDisabled />
+                    </VStack>
+                </ModalBody>
+                <ModalFooter>
+                    <Button variant="ghost" mr={3} onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button colorScheme="red" onClick={() => handleDeleteProduct(product._id)}>
+                        Delete
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
         </Box>
     );
 };
